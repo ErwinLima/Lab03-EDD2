@@ -61,17 +61,40 @@ public class Program
                 return;
             }
             Persona p1 = temporal.Value;
+            string path = @"C:\Users\AndresLima\Desktop\compressed";
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            int i = 1;
             foreach (var item in p1.cartas)
             {
                 try
                 {
-
+                    string content = File.ReadAllText(item);
+                    List<int>? code = encode(content);
+                    string text = "";
+                    foreach (var num in code)
+                    {
+                        if (num == code.Last())
+                        {
+                            text += num.ToString();
+                        }
+                        else
+                        {
+                            text += num.ToString() + ",";
+                        }
+                    }
+                    string fileName = "compressed-REC-" + p1.dpi + "-" + i.ToString() + ".txt";
+                    fileName = path + "\\" + fileName;
+                    File.WriteAllText(fileName, text);
                 }
                 catch (Exception e)
                 {
 
                     throw new Exception("Sucedio un error inesperado");
                 }
+                i++;
             }
         }
         catch (Exception e)
@@ -81,7 +104,7 @@ public class Program
         }
     }
 
-    public List<int> encode (string text)
+    public static List<int> encode (string text)
     {
         Dictionary<string, int> dictionary = new Dictionary<string, int>();
         for (int i = 0; i < 256; i++)
@@ -114,7 +137,7 @@ public class Program
         return resul;
     }
 
-    public string decompress (List<int> lista)
+    public static string decompress (List<int> lista)
     {
         Dictionary<int, string> dictionary = new Dictionary<int, string>();
         for (int i = 0; i < 256; i++)

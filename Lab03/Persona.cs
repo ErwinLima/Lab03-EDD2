@@ -12,6 +12,8 @@ namespace Lab03
         public string dpi { get; set; }
         public DateTime datebirth { get; set; }
         public string address { get; set; }
-        public string[] companies { get; set; }                                
+        public string[] companies { get; set; }       
+        
+        public string[] cartas { get; set; }
     }
 }

@@ -185,7 +185,7 @@
             temporal.Value = item;
         }
 
-        public T Search(T item, Delegate condition)
+        public Nodo<T> Search(T item, Delegate condition)
         {
             Nodo<T>? temporal = Root;
             while (temporal != null && (int)condition.DynamicInvoke(item, temporal!.Value) != 0)
@@ -199,7 +199,7 @@
                     temporal = temporal.Left;
                 }
             }
-            return temporal!.Value;
+            return temporal!;
         }
 
         private Nodo<T> ReBalance(Nodo<T> nodo)

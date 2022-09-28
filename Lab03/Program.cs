@@ -67,24 +67,15 @@ public class Program
                 Directory.CreateDirectory(path);
             }
             int i = 1;
+            Console.WriteLine("Codificando...");
             foreach (var item in p1.cartas)
             {
                 try
                 {
                     string content = File.ReadAllText(item);
                     List<int>? code = encode(content);
-                    string text = "";
-                    foreach (var num in code)
-                    {
-                        if (num == code.Last())
-                        {
-                            text += num.ToString();
-                        }
-                        else
-                        {
-                            text += num.ToString() + ",";
-                        }
-                    }
+                    char delimeter = ',';
+                    string text = String.Join(delimeter, code);                    
                     string fileName = "compressed-REC-" + p1.dpi + "-" + i.ToString() + ".txt";
                     fileName = path + "\\" + fileName;
                     File.WriteAllText(fileName, text);
@@ -95,6 +86,29 @@ public class Program
                     throw new Exception("Sucedio un error inesperado");
                 }
                 i++;
+            }
+
+            path = @"C:\Users\AndresLima\Desktop\decompressed";
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }            
+
+            Console.WriteLine("Decodificando...");
+            string[] cardsToDecode = Directory.GetFiles(@"C:\Users\AndresLima\Desktop\compressed", "compressed-REC-" + p1.dpi + "*");
+            int j = 1;
+            foreach (var item in cardsToDecode)
+            {
+                string[] info = File.ReadAllText(item).Split(",");
+                List<int> lista = new List<int>();
+                foreach (var num in info)
+                {
+                    lista.Add(Convert.ToInt32(num));
+                }
+                string decompressed = Decompress(lista);
+                string newFile = @"C:\Users\AndresLima\Desktop\decompressed\decom-REC-" +p1.dpi + j.ToString() + ".txt";
+                File.WriteAllText(newFile, decompressed);
+                j++;
             }
         }
         catch (Exception e)
@@ -111,7 +125,7 @@ public class Program
         {
             dictionary.Add(((char)i).ToString(), i);
         }
-        string w = "";
+        string w = string.Empty;
         List<int> resul = new List<int>();
 
         foreach (var c in text)
@@ -137,35 +151,33 @@ public class Program
         return resul;
     }
 
-    public static string decompress (List<int> lista)
+    public static string Decompress(List<int> compressed)
     {
+        // build the dictionary
         Dictionary<int, string> dictionary = new Dictionary<int, string>();
         for (int i = 0; i < 256; i++)
-        {
             dictionary.Add(i, ((char)i).ToString());
-        }
-        string w = dictionary[lista[0]];
-        lista.RemoveAt(0);
-        StringBuilder resul = new StringBuilder(w);
 
-        foreach (var item in lista)
+        string w = dictionary[compressed[0]];
+        compressed.RemoveAt(0);
+        StringBuilder decompressed = new StringBuilder(w);
+
+        foreach (int k in compressed)
         {
             string entry = "";
-            if (dictionary.ContainsKey(item))
-            {
-                entry = dictionary[item];
-            }else if(item == dictionary.Count)
-            {
+            if (dictionary.ContainsKey(k))
+                entry = dictionary[k];
+            else if (k == dictionary.Count)
                 entry = w + w[0];
-            }
 
-            resul.Append(entry);
+            decompressed.Append(entry);
 
+            // new sequence; add it to the dictionary
             dictionary.Add(dictionary.Count, w + entry[0]);
 
             w = entry;
         }
 
-        return resul.ToString();
+        return decompressed.ToString();
     }
 }
